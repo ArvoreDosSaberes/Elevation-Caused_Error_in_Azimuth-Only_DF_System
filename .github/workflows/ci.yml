@@ -12,9 +12,6 @@ jobs:
   build:
     name: Build on Ubuntu
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./Elevation-CAused_Error_in_Azimuth-Only_DF_System
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -45,7 +42,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: error-surface-csv
-          path: Elevation-CAused_Error_in_Azimuth-Only_DF_System/error_surface.csv
+          path: error_surface.csv
 
       - name: Install doxygen
         run: |
@@ -53,10 +50,10 @@ jobs:
           sudo apt-get install -y doxygen
 
       - name: Generate docs (Doxygen)
-        run: doxygen ${GITHUB_WORKSPACE}/Elevation-CAused_Error_in_Azimuth-Only_DF_System/Doxyfile
+        run: doxygen ${GITHUB_WORKSPACE}/Doxyfile
 
       - name: Upload docs artifact
         uses: actions/upload-artifact@v4
         with:
           name: docs-html
-          path: Elevation-CAused_Error_in_Azimuth-Only_DF_System/docs/html
+          path: docs/html
