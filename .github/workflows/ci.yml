@@ -1,0 +1,62 @@
+name: CI Build (df_demo)
+
+on:
+  push:
+    paths:
+      - '**/*'
+  pull_request:
+    paths:
+      - '**/*'
+
+jobs:
+  build:
+    name: Build on Ubuntu
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Elevation-CAused_Error_in_Azimuth-Only_DF_System
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential cmake pkg-config \
+            libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev \
+            libgl1-mesa-dev libglu1-mesa-dev libasound2-dev libpulse-dev \
+            libudev-dev libdrm-dev libgbm-dev
+
+      - name: Configure (CMake)
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build -j
+
+      - name: Run demo (generate CSV)
+        run: |
+          ./build/df_demo
+          ls -l
+
+      - name: Upload CSV artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: error-surface-csv
+          path: Elevation-CAused_Error_in_Azimuth-Only_DF_System/error_surface.csv
+
+      - name: Install doxygen
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen
+
+      - name: Generate docs (Doxygen)
+        run: doxygen ${GITHUB_WORKSPACE}/Elevation-CAused_Error_in_Azimuth-Only_DF_System/Doxyfile
+
+      - name: Upload docs artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-html
+          path: Elevation-CAused_Error_in_Azimuth-Only_DF_System/docs/html
